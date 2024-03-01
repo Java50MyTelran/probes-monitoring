@@ -95,5 +95,6 @@
 
 	<modules>
 		<module>analyzer</module>
+		<module>avg-populator</module>
 	</modules>
 </project>
