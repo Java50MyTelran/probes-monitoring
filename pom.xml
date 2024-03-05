@@ -96,5 +96,6 @@
 	<modules>
 		<module>analyzer</module>
 		<module>avg-populator</module>
+		<module>email-notifier</module>
 	</modules>
 </project>

@@ -4,58 +4,52 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-
-import java.net.URI;
-
-import telran.probes.dto.*;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.cloud.stream.binder.test.*;
+import org.springframework.cloud.stream.binder.test.InputDestination;
+import org.springframework.cloud.stream.binder.test.TestChannelBinderConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.web.client.RestTemplate;
 
-import jakarta.validation.constraints.NotNull;
-import telran.probes.service.RangeProviderClientService;
-
+import telran.probes.dto.SensorUpdateData;
+import telran.probes.service.EmailsProviderClientService;
 @SpringBootTest
 @Import(TestChannelBinderConfiguration.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class AnalyzerServiceTest {
+class EmaiNotifierServiceTest {
 	private static final long SENSOR_ID = 123;
-	private static final double MIN_VALUE = 100;
-	private static final double MAX_VALUE = 200;
-	private static final Range RANGE = new Range(MIN_VALUE, MAX_VALUE);
-	private static final String URL = "http://localhost:8282/range/sensor/";
+	private static final String[] EMAILS = {"mail1.gmail.com", "mail2.gmail.com"};
+	private static final String URL = "http://localhost:8585/emails/sensor/";
 	private static final String SENSOR_NOT_FOUND_MESSAGE ="sensor not found";
 	private static final long SENSOR_ID_NOT_FOUND = 124;
-	private static final Range RANGE_DEFAULT =
-			new Range(RangeProviderClientService.MIN_DEFAULT_VALUE, RangeProviderClientService.MAX_DEFAULT_VALUE);
+	private static final String[] EMAILS_DEFAULT = {EmailsProviderClientService.SERVICE_EMAIL};
 	private static final long SENSOR_ID_UNAVAILABLE = 170;
-	private static final Range RANGE_UPDATED = new Range(MIN_VALUE + 10, MAX_VALUE + 10);
+	private static final String[] EMAILS_UPDATED = {"mail3.gmail.com"};
 	@Autowired
 	InputDestination producer;
 	@Autowired
-	RangeProviderClientService providerService;
+	EmailsProviderClientService providerService;
 	@MockBean
 	RestTemplate restTemplate;
-	private String updateBindingName = "updateRangeConsumer-in-0";
-
+	private String updateBindingName = "updateEmailsConsumer-in-0";
 	@Test
 	@Order(1)
 	void normalFlowNoCache() {
-		ResponseEntity<Range> responseEntity = new ResponseEntity<>(RANGE,HttpStatus.OK);
-		when(restTemplate.exchange(getUrl(SENSOR_ID), HttpMethod.GET, null, Range.class))
+		ResponseEntity<String[]> responseEntity = new ResponseEntity<>(EMAILS,HttpStatus.OK);
+		when(restTemplate.exchange(getUrl(SENSOR_ID), HttpMethod.GET, null, String[].class))
 		.thenReturn(responseEntity );
-		assertEquals(RANGE, providerService.getRange(SENSOR_ID));
+		assertArrayEquals(EMAILS, providerService.getMails(SENSOR_ID));
 	}
 	@SuppressWarnings("unchecked")
 	@Order(2)
@@ -69,7 +63,7 @@ class AnalyzerServiceTest {
 				return null;
 			}
 		});
-		assertEquals(RANGE, providerService.getRange(SENSOR_ID));
+		assertEquals(EMAILS, providerService.getMails(SENSOR_ID));
 	}
 	@Test
 	@Order(3)
@@ -77,37 +71,34 @@ class AnalyzerServiceTest {
 		ResponseEntity<String> responseEntity = new ResponseEntity<>(SENSOR_NOT_FOUND_MESSAGE,HttpStatus.NOT_FOUND);
 		when(restTemplate.exchange(getUrl(SENSOR_ID_NOT_FOUND), HttpMethod.GET, null, String.class))
 		.thenReturn(responseEntity );
-		assertEquals(RANGE_DEFAULT, providerService.getRange(SENSOR_ID_NOT_FOUND));
+		assertArrayEquals(EMAILS_DEFAULT, providerService.getMails(SENSOR_ID_NOT_FOUND));
 		
 	}
 	@Test
 	@Order(4)
-	void defaultRangeNotInCache() {
-		ResponseEntity<Range> responseEntity = new ResponseEntity<>(RANGE,HttpStatus.OK);
-		when(restTemplate.exchange(getUrl(SENSOR_ID_NOT_FOUND), HttpMethod.GET, null, Range.class))
+	void defaultNotInCache() {
+		ResponseEntity<String[]> responseEntity = new ResponseEntity<>(EMAILS,HttpStatus.OK);
+		when(restTemplate.exchange(getUrl(SENSOR_ID_NOT_FOUND), HttpMethod.GET, null, String[].class))
 		.thenReturn(responseEntity );
-		assertEquals(RANGE, providerService.getRange(SENSOR_ID_NOT_FOUND));
+		assertArrayEquals(EMAILS, providerService.getMails(SENSOR_ID_NOT_FOUND));
 	}
 	@SuppressWarnings("unchecked")
 	@Test
 	void remoteWebServiceUnavailable() {
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(), any(Class.class)))
 		.thenThrow(new RuntimeException("Service is unavailable"));
-		assertEquals(RANGE_DEFAULT, providerService.getRange(SENSOR_ID_UNAVAILABLE));
+		assertArrayEquals(EMAILS_DEFAULT, providerService.getMails(SENSOR_ID_UNAVAILABLE));
 	}
 	@Test
 	void updateRangeSensorInMap() throws InterruptedException {
 		
 		producer.send
 		(new GenericMessage<SensorUpdateData>(new SensorUpdateData(SENSOR_ID,
-				RANGE_UPDATED, null)), updateBindingName);
+				null, EMAILS_UPDATED)), updateBindingName);
 		Thread.sleep(100);
-		assertEquals(RANGE_UPDATED, providerService.getRange(SENSOR_ID));
+		assertArrayEquals(EMAILS_UPDATED, providerService.getMails(SENSOR_ID));
 	}
-	
-
 	private String getUrl(long sensorId) {
-		
 		return URL + sensorId;
 	}
 
