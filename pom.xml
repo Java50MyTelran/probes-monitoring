@@ -98,5 +98,9 @@
 		<module>avg-populator</module>
 		<module>email-notifier</module>
 		<module>avg-reducer</module>
+		<module>admin-console</module>
+		<module>sensor-range-provider</module>
+		<module>sensor-emails-provider</module>
+		<module>probes</module>
 	</modules>
 </project>
