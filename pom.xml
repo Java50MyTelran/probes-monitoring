@@ -102,5 +102,6 @@
 		<module>sensor-range-provider</module>
 		<module>sensor-emails-provider</module>
 		<module>probes</module>
+		<module>config-server</module>
 	</modules>
 </project>
