@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.stream.binder.test.*;
@@ -44,7 +45,8 @@ RangeProviderClientService clientService;
 	OutputDestination consumer;
 	private ProbeData probeNormalData =  new ProbeData(SENSOR_ID, VALUE_NORMAL, System.currentTimeMillis());
 	private String consumerBindingName = "analyzerConsumer-in-0";
-	private String producerBindingName = "analyzerProducer-out-0";
+	@Value("${app.analyzer.producer.binding.name}")
+	private String producerBindingName;
 	private ProbeData probeGreaterMaxData = new ProbeData(SENSOR_ID, VALUE_GREATER_MAX, System.currentTimeMillis());
 	ObjectMapper mapper = new ObjectMapper();
 	private ProbeData probeLessMinData = new ProbeData(SENSOR_ID, VALUE_LESS_MIN, System.currentTimeMillis());
