@@ -1,10 +1,11 @@
 package telran.probes.service;
 
-import java.net.URI;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,8 @@ import telran.probes.dto.*;
 public class EmailsProviderClientServiceImpl implements EmailsProviderClientService {
 	final RestTemplate restTemplate;
 	final ServiceConfiguration serviceConfiguration;
+	@Value("${app.emails.provider.default}")
+	String defaultEmail;
 	HashMap<Long, String[]> cache = new HashMap<>();
 	@Override
 	public String[] getMails(long sensorId) {
@@ -53,7 +56,7 @@ public class EmailsProviderClientServiceImpl implements EmailsProviderClientServ
 
 	}
 	private String getUrl(long sensorId) {
-		String url = String.format("http://%s:%d%s%d", serviceConfiguration.getHost(), serviceConfiguration.getPort(),
+		String url = String.format("http://%s:%d%s/%d", serviceConfiguration.getHost(), serviceConfiguration.getPort(),
 				serviceConfiguration.getPath(), sensorId);
 		log.debug("url created is {}", url);
 		return url;
