@@ -1,0 +1,123 @@
+version: "3"
+services:
+   config-server:
+      build:
+         config-server
+      deploy:
+         resources:
+            limits:
+               cpus: '0.5'
+               memory: 300M
+            reservations:
+               cpus: '0.3'
+               memory: 250M
+      ports:
+         - 8888:8888             
+   sensor-emails-provider:
+      build:
+         sensor-emails-provider
+      deploy:
+         resources:
+            limits:
+               cpus: '0.5'
+               memory: 300M
+            reservations:
+               cpus: '0.3'
+               memory: 250M 
+      environment:
+         - MONGO_PASSWORD=${MONGO_PASSWORD}
+      ports:
+         - 8282:8282         
+   sensor-range-provider:
+      build:
+         sensor-range-provider
+      deploy:
+         resources:
+            limits:
+               cpus: '0.5'
+               memory: 300M
+            reservations:
+               cpus: '0.3'
+               memory: 250M 
+      environment:
+         - MONGO_PASSWORD=${MONGO_PASSWORD}
+      ports:
+         - 8585:8585
+   admin-console:
+      build:
+         admin-console
+      deploy:
+         resources:
+            limits:
+               cpus: '0.5'
+               memory: 300M
+            reservations:
+               cpus: '0.3'
+               memory: 250M
+      environment:
+         - MONGO_PASSWORD=${MONGO_PASSWORD}
+         - STREAM_API_SECRET=${STREAM_API_SECRET}
+      ports:
+      - 9090:8080
+   analyzer:
+      build:
+         analyzer
+      deploy:
+         resources:
+            limits:
+               cpus: '0.5'
+               memory: 300M
+            reservations:
+               cpus: '0.3'
+               memory: 250M
+      environment:
+         - STREAM_API_SECRET=${STREAM_API_SECRET}
+   avg-populator:
+      build:
+         avg-populator
+      deploy:
+         resources:
+            limits:
+               cpus: '0.5'
+               memory: 300M
+            reservations:
+               cpus: '0.3'
+               memory: 250M
+      environment:
+         - MONGO_PASSWORD=${MONGO_PASSWORD}
+         - STREAM_API_SECRET=${STREAM_API_SECRET}
+   avg-reducer:
+      build:
+         avg-reducer
+      deploy:
+         resources:
+            limits:
+               cpus: '0.5'
+               memory: 300M
+            reservations:
+               cpus: '0.3'
+               memory: 250M
+      environment:
+         - STREAM_API_SECRET=${STREAM_API_SECRET}
+         - REDIS_PASSWORD=${REDIS_PASSWORD}
+   email-notifier:
+      build:
+         email-notifier
+      deploy:
+         resources:
+            limits:
+               cpus: '0.5'
+               memory: 300M
+            reservations:
+               cpus: '0.3'
+               memory: 250M
+      environment:
+         - STREAM_API_SECRET=${STREAM_API_SECRET}
+         - MAIL_PASSWORD=${MAIL_PASSWORD}
+                     
+                                          
+                           
+                     
+                              
+                        
+                                                                                                                     
