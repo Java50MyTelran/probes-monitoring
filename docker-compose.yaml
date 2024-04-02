@@ -11,8 +11,7 @@ services:
             reservations:
                cpus: '0.3'
                memory: 250M
-      ports:
-         - 8888:8888             
+             
    sensor-emails-provider:
       build:
          sensor-emails-provider
@@ -26,8 +25,7 @@ services:
                memory: 250M 
       environment:
          - MONGO_PASSWORD=${MONGO_PASSWORD}
-      ports:
-         - 8282:8282         
+          
    sensor-range-provider:
       build:
          sensor-range-provider
@@ -41,8 +39,7 @@ services:
                memory: 250M 
       environment:
          - MONGO_PASSWORD=${MONGO_PASSWORD}
-      ports:
-         - 8585:8585
+      
    admin-console:
       build:
          admin-console
@@ -57,8 +54,7 @@ services:
       environment:
          - MONGO_PASSWORD=${MONGO_PASSWORD}
          - STREAM_API_SECRET=${STREAM_API_SECRET}
-      ports:
-      - 9090:8080
+      
    analyzer:
       build:
          analyzer

@@ -107,5 +107,6 @@
 		<module>sensor-emails-provider</module>
 		<module>probes</module>
 		<module>config-server</module>
+		<module>gateway</module>
 	</modules>
 </project>
