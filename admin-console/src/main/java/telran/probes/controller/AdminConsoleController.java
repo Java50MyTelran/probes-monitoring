@@ -9,28 +9,27 @@ import telran.probes.dto.*;
 import telran.probes.service.AdminConsoleService;
 
 @RestController
-@RequestMapping("sensors")
 @RequiredArgsConstructor
 @Slf4j
 public class AdminConsoleController {
 	final AdminConsoleService adminConsoleService;
-	@PostMapping("range")
+	@PostMapping("${app.admin.range.url}")
 	SensorRange addSensorRange(@RequestBody @Valid SensorRange sensorRange) {
 		log.debug("adding received sensor range: {}", sensorRange);
 		return adminConsoleService.addSensorRange(sensorRange);
 	}
-	@PostMapping("emails")
+	@PostMapping("${app.admin.emails.url}")
 	SensorEmails addSensorEmails(@RequestBody @Valid SensorEmails sensorEmails) {
 		log.debug("adding received sensor emails: {}", sensorEmails);
 		return adminConsoleService.addSensorEmails(sensorEmails);
 		
 	}
-	@PutMapping("range")
+	@PutMapping("${app.admin.range.url}")
 	SensorRange updateSensorRange(@RequestBody @Valid SensorRange sensorRange) {
 		log.debug("updating received sensor range: {}", sensorRange);
 		return adminConsoleService.updateSensorRange(sensorRange);
 	}
-	@PutMapping("emails")
+	@PutMapping("${app.admin.emails.url}")
 	SensorEmails updateSensorEmails(@RequestBody @Valid SensorEmails sensorEmails) {
 		log.debug("updating received sensor emails: {}", sensorEmails);
 		return adminConsoleService.updateSensorEmails(sensorEmails);

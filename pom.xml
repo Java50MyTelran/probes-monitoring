@@ -108,5 +108,6 @@
 		<module>probes</module>
 		<module>config-server</module>
 		<module>gateway</module>
+		<module>accounts-provider</module>
 	</modules>
 </project>
