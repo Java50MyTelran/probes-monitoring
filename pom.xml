@@ -110,5 +110,6 @@
 		<module>config-server</module>
 		<module>gateway</module>
 		<module>accounts-provider</module>
+		<module>sns-notifier</module>
 	</modules>
 </project>
