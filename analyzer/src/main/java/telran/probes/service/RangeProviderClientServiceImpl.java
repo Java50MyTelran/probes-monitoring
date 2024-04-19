@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -11,8 +12,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClient;
+import software.amazon.awssdk.services.cloudwatchlogs.model.DescribeLogStreamsRequest;
+import software.amazon.awssdk.services.cloudwatchlogs.model.DescribeLogStreamsResponse;
 import telran.probes.dto.*;
 
 @Service
@@ -22,11 +28,12 @@ public class RangeProviderClientServiceImpl implements RangeProviderClientServic
 	final RestTemplate restTemplate;
 	final ServiceConfiguration serviceConfiguration;
 	HashMap<Long, Range> cache = new HashMap<>();
+	
 
 	@Override
 	public Range getRange(long sensorId) {
 		Range res = cache.get(sensorId);
-		if(res == null) {
+		if (res == null) {
 			log.debug("range for sensor with id {}  doesn't exist in cache", sensorId);
 			res = serviceRequest(sensorId);
 		} else {
@@ -48,7 +55,7 @@ public class RangeProviderClientServiceImpl implements RangeProviderClientServic
 			cache.put(sensorId, range);
 		} catch (Exception e) {
 			log.error("error at service request: {}", e.getMessage());
-			range = new Range(MIN_DEFAULT_VALUE, MAX_DEFAULT_VALUE);
+		
 			log.warn("default range value: {}", range);
 		}
 		return range;
@@ -74,5 +81,6 @@ public class RangeProviderClientServiceImpl implements RangeProviderClientServic
 			cache.put(sensorId, range);
 		}
 	}
+
 
 }
