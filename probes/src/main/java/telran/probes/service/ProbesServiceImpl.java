@@ -60,6 +60,7 @@ private double getRandomNormalValue(Range range) {
 		}
 		rangesMap = documents.stream()
 				.collect(Collectors.toMap(d -> d.getSensorId(), d -> d.getRange()));
+		//for integration test of sending logs/alarms to CloudWatch
 		rangesMap.put(1000l, new Range(100, 200));
 		log.trace("map of ranges is {}", rangesMap);
 		sensorIds = rangesMap.keySet().stream().mapToLong(id -> id).toArray();
